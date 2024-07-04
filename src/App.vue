@@ -3,6 +3,8 @@ import { ref, onMounted, defineOptions } from 'vue'
 import { Graph, type Node, Edge } from '@antv/x6'
 import NodeTest from './components/node/node-test.vue'
 import { register, getTeleport } from '@antv/x6-vue-shape'
+import { Dnd } from '@antv/x6-plugin-dnd'
+
 const container = ref(null)
 
 
@@ -10,6 +12,7 @@ const container = ref(null)
 const TeleportContainer = getTeleport()
 // 创建画布
 let graph: Graph
+let dnd: Dnd
 onMounted(() => {
   graph = new Graph({
     container: container.value!,
@@ -27,6 +30,9 @@ onMounted(() => {
         },
       ],
     }
+  })
+  dnd = new Dnd({
+    target: graph,
   })
 })
 
@@ -57,7 +63,7 @@ register({
   height: 80,
   width: 200,
 })
-const addNode = () => { 
+const addNode = () => {
   // const node = graph.addNode({
   //   shape: 'rect',
   //   x: 100,
@@ -86,6 +92,17 @@ const addEdge = () => {
   edges.value.push(edge)
 }
 
+
+//拖拽
+
+
+const startDrag = (e) => {
+  // 该 node 为拖拽的节点，默认也是放置到画布上的节点，可以自定义任何属性
+  const node = graph.createNode({
+    shape: 'NodeTest',
+  })
+  dnd.start(node, e)
+}
 </script>
 
 
@@ -100,6 +117,9 @@ const addEdge = () => {
         <div>
           <b>节点</b>
           <div class="flex flex-col gap-2 mt-2 border min-h-24 bg-white">
+            <div class="p-2 border" @mousedown="startDrag">
+              自定义节点
+            </div>
           </div>
         </div>
 
